@@ -1,0 +1,23 @@
+:root {
+  --headerBackground1: #3562bd;
+  --headerBackground2: #11084b;
+}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0rem;
+  padding: 0rem;
+}
+
+header h1 {
+  color: white;
+  background: linear-gradient(
+    0.25turn,
+    var(--headerBackground1),
+    var(--headerBackground2)
+  );
+  padding-top: 0.15em;
+  padding-bottom: 0.25em;
+}
