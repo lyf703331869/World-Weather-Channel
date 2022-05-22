@@ -13,6 +13,7 @@ fetch(weatherUrl)
     var lat = data.coord.lat;
     var lon = data.coord.lon;
     await uvIndex(lat, lon);
+    
     var icon = data.weather[0].icon;
     var iconPage = `https://openweathermap.org/img/wn/${icon}.png`;
     var iconPic = `<img src="${iconPage}"/>`;
