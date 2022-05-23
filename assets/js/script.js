@@ -15,8 +15,8 @@ function searchWeather() {
     if (response.ok) {
       $("#historyBtn").append(
         `<a
-            class="btn btn-dark my-1 w-100"
-            id="searchBtn"
+            class="btn btn-dark my-2 w-100"
+            id="searchResult"
             style="position: relative; vertical-align: top"
           >
             ${search.value}
@@ -24,7 +24,6 @@ function searchWeather() {
       );
       return response.json().then(function (data) {
         $("#city").text(search.value + " (" + today + ")");
-        search.value = "";
         var temperature = data.main.temp.toFixed(2) + " F";
         var wind = data.wind.speed.toFixed(2) + " MPH";
         var humidity = data.main.humidity + "%";
@@ -45,7 +44,6 @@ function searchWeather() {
             return response.json();
           })
           .then(function (data) {
-            $("h3").text("5-Day Forecast");
             var uvIndex = data.current.uvi;
             if (uvIndex < 4) {
               $("#uvi").attr("style", "background-color: lightgreen");
@@ -60,6 +58,19 @@ function searchWeather() {
             $("#uvindex").text("UV Index: ");
             $("#uvi").text(uvIndex);
 
+            $("h3").text("5-Day Forecast");
+            currentWeatherInfo = {
+              temp: "Temp: " + temperature,
+              wind: "Wind: " + wind,
+              humidity: "Humidity: " + humidity,
+              unindex: "UV Index: " + uvIndex,
+            };
+            localStorage.setItem(
+              search.value,
+              JSON.stringify(currentWeatherInfo)
+            );
+            search.value = "";
+
             for (var i = 0; i < 5; i++) {
               var forecasticon = data.daily[i].weather[0].icon;
               $("#fiveDays").append(
@@ -73,10 +84,12 @@ function searchWeather() {
                   "<p>" +
                   "Temperature: " +
                   data.daily[i].temp.day +
+                  " F" +
                   "</p>" +
                   "<p>" +
                   "Wind: " +
                   data.daily[i].wind_speed +
+                  " MPH" +
                   "</p>" +
                   "<p>" +
                   "Humidity: " +
