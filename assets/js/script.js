@@ -1,3 +1,4 @@
+//
 var searchBtn = document.getElementById("searchBtn");
 var today = moment().format("l");
 function searchWeather() {
