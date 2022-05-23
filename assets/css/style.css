@@ -1,6 +1,7 @@
 :root {
   --headerBackground1: #3562bd;
   --headerBackground2: #11084b;
+  --forecast: #2e3e50;
 }
 * {
   box-sizing: border-box;
@@ -20,4 +21,8 @@ header h1 {
   );
   padding-top: 0.15em;
   padding-bottom: 0.25em;
+}
+
+#forecast-card {
+  background-color: var(--forecast);
 }
