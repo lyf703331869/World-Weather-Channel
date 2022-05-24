@@ -1,9 +1,24 @@
-//
 var searchBtn = document.getElementById("searchBtn");
+var historyCard = document.getElementById("historyCard");
 var today = moment().format("l");
-function searchWeather() {
-  var search = document.getElementById("search-input");
 
+let storedWeather = JSON.parse(localStorage.getItem("weather")) || [];
+
+console.log("local storage city info", storedWeather);
+
+//function to layout the history buttons base on local storage
+
+function searchWeather() {
+  // if the history inclues search, alert and return
+  var search = document.getElementById("search-input");
+  for (var i = 0; i < storedWeather.length; i++) {
+    if (storedWeather[i].cityName === search.value) {
+      alert(
+        "City has been searched already. Clearing history or search other cities."
+      );
+      return;
+    }
+  }
   var weatherUrl =
     `https://api.openweathermap.org/data/2.5/weather?q=` +
     search.value +
@@ -13,17 +28,18 @@ function searchWeather() {
 
   fetch(weatherUrl).then(function (response) {
     if (response.ok) {
-      $("#historyBtn").append(
+      $("#historyCard").append(
         `<a
-            class="btn btn-dark my-2 w-100"
-            id="searchResult"
+            class="btn btn-dark my-2 w-100 searchResult"
             style="position: relative; vertical-align: top"
           >
             ${search.value}
           </a>`
       );
+      $(".searchResult").on("click", historyWeather);
       return response.json().then(function (data) {
-        $("#city").text(search.value + " (" + today + ")");
+        var cityName = search.value;
+        $("#city").text(cityName + " (" + today + ")");
         var temperature = data.main.temp.toFixed(2) + " F";
         var wind = data.wind.speed.toFixed(2) + " MPH";
         var humidity = data.main.humidity + "%";
@@ -45,6 +61,7 @@ function searchWeather() {
           })
           .then(function (data) {
             var uvIndex = data.current.uvi;
+            readHistory(temperature, wind, humidity, uvIndex, icon, cityName);
             if (uvIndex < 4) {
               $("#uvi").attr("style", "background-color: lightgreen");
             } else if (uvIndex < 8) {
@@ -57,18 +74,7 @@ function searchWeather() {
             $("#humidity").text("Humidity: " + humidity);
             $("#uvindex").text("UV Index: ");
             $("#uvi").text(uvIndex);
-
             $("h3").text("5-Day Forecast");
-            currentWeatherInfo = {
-              temp: "Temp: " + temperature,
-              wind: "Wind: " + wind,
-              humidity: "Humidity: " + humidity,
-              unindex: "UV Index: " + uvIndex,
-            };
-            localStorage.setItem(
-              search.value,
-              JSON.stringify(currentWeatherInfo)
-            );
             search.value = "";
 
             for (var i = 0; i < 5; i++) {
@@ -105,6 +111,53 @@ function searchWeather() {
       alert("Error: " + search.value + " Is " + response.statusText);
     }
   });
+}
+
+function readHistory(temperature, wind, humidity, uvIndex, icon, cityName) {
+  var cityWeatherObject = {
+    temperature: {},
+    wind: {},
+    humidity: {},
+    uvIndex: {},
+    icon: {},
+    cityName: "",
+  };
+
+  cityWeatherObject.temperature = temperature;
+  cityWeatherObject.wind = wind;
+  cityWeatherObject.humidity = humidity;
+  cityWeatherObject.uvIndex = uvIndex;
+  cityWeatherObject.icon = icon;
+  cityWeatherObject.cityName = cityName;
+
+  storedWeather.push(cityWeatherObject);
+
+  localStorage.setItem("weather", JSON.stringify(storedWeather));
+}
+
+function historyWeather(event) {
+  event.stopImmediatePropagation();
+  $("#fiveDays").text("");
+  var citySeleted = event.target.text.trim();
+  for (var i = 0; i < storedWeather.length; i++) {
+    if (storedWeather[i].cityName === citySeleted) {
+      $("#temp").text("Temp: " + storedWeather[i].temperature);
+      $("#wind").text("Wind: " + storedWeather[i].wind);
+      $("#humidity").text("Humidity: " + storedWeather[i].humidity);
+      $("#uvindex").text("UV Index: ");
+      $("#uvi").text(storedWeather[i].uvIndex);
+      var icon = storedWeather[i].icon;
+      var iconLink = `https://openweathermap.org/img/wn/${icon}.png`;
+      $("#icon").attr("src", `${iconLink}`);
+      if (storedWeather[i].uvIndex < 4) {
+        $("#uvi").attr("style", "background-color: lightgreen");
+      } else if (storedWeather[i].uvIndex < 8) {
+        $("#uvi").attr("style", "background-color: yellow");
+      } else {
+        $("#uvi").attr("style", "background-color: lightred");
+      }
+    }
+  }
 }
 
 searchBtn.addEventListener("click", searchWeather);
