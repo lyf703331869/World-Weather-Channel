@@ -3,18 +3,41 @@ var historyCard = document.getElementById("historyCard");
 var today = moment().format("l");
 
 let storedWeather = JSON.parse(localStorage.getItem("weather")) || [];
+let storedWeatherForecast = JSON.parse(localStorage.getItem("forecast")) || [];
 
 console.log("local storage city info", storedWeather);
 
 //function to layout the history buttons base on local storage
+for (var i = 0; i < storedWeather.length; i++) {
+  $("#historyCard").append(
+    `<a
+          class="btn btn-dark my-2 w-100 searchResult"
+          style="position: relative; vertical-align: top"
+        >
+          ${storedWeather[i].cityName}
+        </a>`
+  );
+}
 
 function searchWeather() {
-  // if the history inclues search, alert and return
+  //empty the page
+  searchBtn.innerHTML = "";
+  $("#icon").attr("src", "");
+  $("#city").text("");
+  $("#temp").text("");
+  $("#wind").text("");
+  $("#humidity").text("");
+  $("#uvindex").text("");
+  $("#uvi").text("");
+  $("#uvi").attr("style", "background-color: white");
+  $("h3").text("");
+  $("#fiveDays").text("");
   var search = document.getElementById("search-input");
+  // if the history inclues search, alert and return
   for (var i = 0; i < storedWeather.length; i++) {
     if (storedWeather[i].cityName === search.value) {
       alert(
-        "City has been searched already. Clearing history or search other cities."
+        "City has been searched already.\nCheck below history or search other cities."
       );
       return;
     }
@@ -23,8 +46,6 @@ function searchWeather() {
     `https://api.openweathermap.org/data/2.5/weather?q=` +
     search.value +
     `&appid=c3b1abc2a30e4e460e0d8b9597a2488b&units=imperial`;
-
-  $("#fiveDays").text("");
 
   fetch(weatherUrl).then(function (response) {
     if (response.ok) {
@@ -88,7 +109,7 @@ function searchWeather() {
                   "</p>" +
                   `<img src="https://openweathermap.org/img/wn/${forecasticon}.png">` +
                   "<p>" +
-                  "Temperature: " +
+                  "Temp: " +
                   data.daily[i].temp.day +
                   " F" +
                   "</p>" +
@@ -103,6 +124,13 @@ function searchWeather() {
                   "%" +
                   "</p>" +
                   "</div>"
+              );
+              forecastHistory(
+                data.daily[i].temp.day,
+                data.daily[i].wind_speed,
+                data.daily[i].humidity,
+                data.daily[i].weather[0].icon,
+                cityName
               );
             }
           });
@@ -141,6 +169,7 @@ function historyWeather(event) {
   var citySeleted = event.target.text.trim();
   for (var i = 0; i < storedWeather.length; i++) {
     if (storedWeather[i].cityName === citySeleted) {
+      $("#city").text(storedWeather[i].cityName + " (" + today + ")");
       $("#temp").text("Temp: " + storedWeather[i].temperature);
       $("#wind").text("Wind: " + storedWeather[i].wind);
       $("#humidity").text("Humidity: " + storedWeather[i].humidity);
@@ -158,6 +187,66 @@ function historyWeather(event) {
       }
     }
   }
+  for (var j = 0; j < storedWeatherForecast.length; j++) {
+    if (storedWeatherForecast[j].cityName === citySeleted) {
+      var icon = storedWeatherForecast[j].icon;
+      $("#fiveDays").append(
+        "<div class='text-light p-2' id='forecast-card'>" +
+          "<p>" +
+          moment()
+            .add(j + 1, "days")
+            .format("l") +
+          "</p>" +
+          `<img src="https://openweathermap.org/img/wn/${icon}.png">` +
+          "<p>" +
+          "Temp: " +
+          storedWeatherForecast[j].temp +
+          " F" +
+          "</p>" +
+          "<p>" +
+          "Wind: " +
+          storedWeatherForecast[j].wind +
+          " MPH" +
+          "</p>" +
+          "<p>" +
+          "Humidity: " +
+          storedWeatherForecast[j].humidity +
+          "%" +
+          "</p>" +
+          "</div>"
+      );
+    }
+  }
 }
 
+function forecastHistory(temp, wind, humidity, icon, cityName) {
+  var cityWeatherForecastObject = {
+    temperature: {},
+    wind: {},
+    humidity: {},
+    icon: {},
+    cityName: "",
+  };
+  cityWeatherForecastObject.temperature = temp;
+  cityWeatherForecastObject.wind = wind;
+  cityWeatherForecastObject.humidity = humidity;
+  cityWeatherForecastObject.icon = icon;
+  cityWeatherForecastObject.cityName = cityName;
+
+  storedWeatherForecast.push(cityWeatherForecastObject);
+
+  localStorage.setItem("forecast", JSON.stringify(storedWeatherForecast));
+}
+
+//clear history function
+function clearHistory() {
+  localStorage.removeItem("weather");
+  localStorage.removeItem("forecast");
+  storedWeather = [];
+  storedWeatherForecast = [];
+  historyCard.innerHTML = "";
+}
+//interactions
 searchBtn.addEventListener("click", searchWeather);
+$(".searchResult").on("click", historyWeather);
+$(".clearBtn").on("click", clearHistory);
