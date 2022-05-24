@@ -186,6 +186,7 @@ function historyWeather(event) {
       }
     }
   }
+  console.log(storedWeatherForecast);
   for (var i = 0, j = 0; j < storedWeatherForecast.length; j++) {
     if (storedWeatherForecast[j].cityName === citySeleted) {
       var icon = storedWeatherForecast[j].icon;
@@ -198,7 +199,7 @@ function historyWeather(event) {
           `<img src="https://openweathermap.org/img/wn/${icon}.png">` +
           "<p>" +
           "Temp: " +
-          storedWeatherForecast[j].temp +
+          storedWeatherForecast[j].temperature +
           " F" +
           "</p>" +
           "<p>" +
