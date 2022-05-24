@@ -5,8 +5,6 @@ var today = moment().format("l");
 let storedWeather = JSON.parse(localStorage.getItem("weather")) || [];
 let storedWeatherForecast = JSON.parse(localStorage.getItem("forecast")) || [];
 
-console.log("local storage city info", storedWeather);
-
 //function to layout the history buttons base on local storage
 for (var i = 0; i < storedWeather.length; i++) {
   $("#historyCard").append(
@@ -21,7 +19,8 @@ for (var i = 0; i < storedWeather.length; i++) {
 
 function searchWeather() {
   //empty the page
-  searchBtn.innerHTML = "";
+  var search = document.getElementById("search-input");
+  search.innerHTML = "";
   $("#icon").attr("src", "");
   $("#city").text("");
   $("#temp").text("");
@@ -32,7 +31,7 @@ function searchWeather() {
   $("#uvi").attr("style", "background-color: white");
   $("h3").text("");
   $("#fiveDays").text("");
-  var search = document.getElementById("search-input");
+
   // if the history inclues search, alert and return
   for (var i = 0; i < storedWeather.length; i++) {
     if (storedWeather[i].cityName === search.value) {
@@ -187,15 +186,14 @@ function historyWeather(event) {
       }
     }
   }
-  for (var j = 0; j < storedWeatherForecast.length; j++) {
+  for (var i = 0, j = 0; j < storedWeatherForecast.length; j++) {
     if (storedWeatherForecast[j].cityName === citySeleted) {
       var icon = storedWeatherForecast[j].icon;
+      i++;
       $("#fiveDays").append(
         "<div class='text-light p-2' id='forecast-card'>" +
           "<p>" +
-          moment()
-            .add(j + 1, "days")
-            .format("l") +
+          moment().add(i, "days").format("l") +
           "</p>" +
           `<img src="https://openweathermap.org/img/wn/${icon}.png">` +
           "<p>" +
