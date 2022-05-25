@@ -8,7 +8,7 @@ When searching for a city, the user is presented with current and next 5-days co
 
 When searching the same city that has been searched, system will alert user to check from history to limit API call times.
 
-Project link: https://lyf703331869.github.io/weather-dashboard/
+Project link: https://lyf703331869.github.io/World-Weather-Channel/
 ​
 ## Built With
 * HTML
@@ -17,7 +17,7 @@ Project link: https://lyf703331869.github.io/weather-dashboard/
 ​
 ## Usage 
 ​
-Open the application link at https://lyf703331869.github.io/weather-dashboard/
+Open the application link at https://github.com/lyf703331869/World-Weather-Channel
 or open the index.html file in your local browser.
 ​
 <img width="1434" alt="WX20220525-014808@2x" src="https://user-images.githubusercontent.com/103960619/170189015-a6c02160-72b0-4330-bfb0-e62c2d5620f1.png">
